@@ -15,9 +15,8 @@ cd measure-build-time || exit 1
 
 echo "== Configure reference Clang-build with tools from ${CPATH}"
 
-cmake 	-G Ninja \
+cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="$(pwd)/install" \
     -DCMAKE_C_COMPILER=${CPATH}/clang \
     -DCMAKE_CXX_COMPILER=${CPATH}/clang++ \
     -DLLVM_USE_LINKER=lld \
@@ -25,7 +24,8 @@ cmake 	-G Ninja \
     -DLLVM_ENABLE_PROJECTS="clang" \
     -DLLVM_PARALLEL_COMPILE_JOBS="$(nproc)"\
     -DLLVM_PARALLEL_LINK_JOBS="$(nproc)" \
-    ../llvm-project/llvm || (echo "Could not configure project!"; exit 1)
+    -DCMAKE_INSTALL_PREFIX="$(pwd)/install" \
+    || (echo "Could not configure project!"; exit 1)
 
 echo
 echo "== Start Build"

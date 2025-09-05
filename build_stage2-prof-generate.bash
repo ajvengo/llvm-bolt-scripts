@@ -21,19 +21,18 @@ cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DCMAKE_C_COMPILER=${CPATH}/clang \
     -DCMAKE_CXX_COMPILER=${CPATH}/clang++ \
-    -DLLVM_USE_LINKER=${CPATH}/ld.lld \
+    -DLLVM_USE_LINKER=lld \
     -DLLVM_ENABLE_PROJECTS="clang;lld" \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_ENABLE_WARNINGS=OFF \
-    -DCMAKE_INSTALL_PREFIX=${TOPLEV}/stage2-prof-gen/install \
     -DLLVM_BUILD_INSTRUMENTED=IR \
     -DLLVM_BUILD_RUNTIME=OFF \
     -DLLVM_LINK_LLVM_DYLIB=ON \
     -DLLVM_VP_COUNTERS_PER_SITE=6 \
-    -DLLVM_BUILD_INSTRUMENTED=IR \
     -DLLVM_ENABLE_PLUGINS=ON \
-    -DLLVM_BUILD_RUNTIME=No || (echo "Could not configure project!"; exit 1)
+    -DCMAKE_INSTALL_PREFIX=${TOPLEV}/stage2-prof-gen/install \
+    || (echo "Could not configure project!"; exit 1)
 
 echo "== Start Build"
 ninja || (echo "Could not build project!"; exit 1)

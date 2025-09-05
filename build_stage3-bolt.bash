@@ -13,16 +13,16 @@ BOLTPATH=${TOPLEV}/llvm-bolt/bin
 echo "== Configure Build"
 echo "== Build with stage2-prof-use-tools -- $CPATH"
 
-cmake -G Ninja \
+cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DLLVM_BINUTILS_INCDIR=/usr/include \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="$(pwd)/install" \
     -DCMAKE_C_COMPILER=${CPATH}/clang \
     -DCMAKE_CXX_COMPILER=${CPATH}/clang++ \
-    -DLLVM_USE_LINKER=${CPATH}/ld.lld \
+    -DLLVM_USE_LINKER=lld \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DLLVM_ENABLE_PROJECTS="clang" \
-    ../llvm-project/llvm || (echo "Could not configure project!"; exit 1)
+    -DCMAKE_INSTALL_PREFIX="$(pwd)/install" \
+    || (echo "Could not configure project!"; exit 1)
 
 echo "== Start Training Build"
 perf record -o ${TOPLEV}/perf.data --max-size=4G -F 1900 -e cycles:u -j any,u -- ninja clang || (echo "Could not build project for training!"; exit 1)

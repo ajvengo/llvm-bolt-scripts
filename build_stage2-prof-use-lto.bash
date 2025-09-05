@@ -11,6 +11,7 @@ CPATH=${TOPLEV}/llvm-bolt/bin
 echo "== Configure Build"
 echo "== Build with stage1-tools -- $CPATH"
 
+COPT="-O3 -march=x86-64-v3 -mtune=haswell -ffunction-sections -fdata-sections"
 cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DLLVM_BINUTILS_INCDIR=/usr/include \
     -DCLANG_ENABLE_ARCMT=OFF \
@@ -22,21 +23,22 @@ cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DLLVM_INCLUDE_EXAMPLES=OFF \
     -DCMAKE_C_COMPILER=${CPATH}/clang \
     -DCMAKE_CXX_COMPILER=${CPATH}/clang++ \
-    -DLLVM_USE_LINKER=${CPATH}/ld.lld \
+    -DLLVM_USE_LINKER=lld \
     -DLLVM_ENABLE_PROJECTS="clang;lld;compiler-rt;polly" \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCLANG_VENDOR="CachyOS - LLVM 19 BOLT" \
+    -DCLANG_VENDOR="CachyOS - LLVM 18 BOLT" \
     -DLLVM_ENABLE_WARNINGS=OFF \
-    -DCMAKE_INSTALL_PREFIX=${TOPLEV}/stage2-prof-use-lto/install \
     -DLLVM_PROFDATA_FILE=${TOPLEV}/stage2-prof-gen/profiles/clang.profdata \
     -DLLVM_ENABLE_LTO=Thin \
-    -DCMAKE_C_FLAGS="-O3 -march=x86-64-v3 -mtune=haswell -ffunction-sections -fdata-sections" \
-    -DCMAKE_ASM_FLAGS="-O3 -march=x86-64-v3 -mtune=haswell -ffunction-sections -fdata-sections" \
-    -DCMAKE_CXX_FLAGS="-O3 -march=x86-64-v3 -mtune=haswell -ffunction-sections -fdata-sections" \
+    -DCMAKE_C_FLAGS="$COPT" \
+    -DCMAKE_ASM_FLAGS="$COPT" \
+    -DCMAKE_CXX_FLAGS="$COPT" \
     -DCMAKE_EXE_LINKER_FLAGS="-Wl,-znow -Wl,--emit-relocs" \
     -DLLVM_ENABLE_PLUGINS=ON \
-    -DLLVM_ENABLE_TERMINFO=OFF  || (echo "Could not configure project!"; exit 1)
+    -DLLVM_ENABLE_TERMINFO=OFF \
+    -DCMAKE_INSTALL_PREFIX=${TOPLEV}/stage2-prof-use-lto/install \
+    || (echo "Could not configure project!"; exit 1)
 
 echo "== Start Build"
 ninja install || (echo "Could not build project!"; exit 1)

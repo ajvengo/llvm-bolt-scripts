@@ -27,13 +27,13 @@ cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DLLVM_ENABLE_PROJECTS="clang;lld;bolt;compiler-rt;llvm" \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_EXE_LINKER_FLAGS="-Wl,--push-state -Wl,-whole-archive -ljemalloc_pic -Wl,--pop-state -lpthread -lstdc++ -lm -ldl" \
-    -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_BUILD_UTILS=OFF \
     -DLLVM_ENABLE_BACKTRACES=OFF \
     -DLLVM_ENABLE_WARNINGS=OFF \
     -DLLVM_INCLUDE_TESTS=OFF \
     -DLLVM_ENABLE_TERMINFO=OFF \
-    -DCMAKE_INSTALL_PREFIX=${TOPLEV}/llvm-bolt || (echo "Could not configure project!"; exit 1)
+    -DCMAKE_INSTALL_PREFIX=${TOPLEV}/llvm-bolt \
+    || (echo "Could not configure project!"; exit 1)
 
 echo "== Start Build"
 ninja install || (echo "Could not build project!"; exit 1)

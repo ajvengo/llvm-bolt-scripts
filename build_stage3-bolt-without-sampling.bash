@@ -25,14 +25,14 @@ mv ${CPATH}/clang-18.inst ${CPATH}/clang-18
 echo "== Configure Build"
 echo "== Build with stage2-prof-use-lto instrumented clang -- $CPATH"
 
-cmake -G Ninja ../llvm-project/llvm \
+cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DCMAKE_BUILD_TYPE=Release \
     -DLLVM_ENABLE_PROJECTS="clang" \
     -DLLVM_TARGETS_TO_BUILD="X86" \
     -DCMAKE_AR=${CPATH}/llvm-ar \
     -DCMAKE_C_COMPILER=${CPATH}/clang-18 \
     -DCMAKE_CXX_COMPILER=${CPATH}/clang++ \
-    -DLLVM_USE_LINKER=${CPATH}/ld.lld \
+    -DLLVM_USE_LINKER=lld \
     -DCMAKE_RANLIB=${CPATH}/llvm-ranlib \
     -DCMAKE_INSTALL_PREFIX=${TOPLEV}/stage3-without-sampling/install
 
