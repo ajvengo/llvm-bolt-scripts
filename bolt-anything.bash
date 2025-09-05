@@ -40,7 +40,7 @@ create_path() {
 
 instrument() {
     echo "Instrument binary with llvm-bolt"
-    LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt \
+    LD_PRELOAD=/usr/lib64/libjemalloc.so.2 ${BOLTPATH}/llvm-bolt \
         --instrument \
         --instrumentation-file-append-pid \
         --instrumentation-file="${FDATA}/${BINARY}.fdata" \
@@ -55,14 +55,14 @@ instrument() {
 
 merge_fdata() {
     echo "Merging generated profiles"
-    LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/merge-fdata "${FDATA}/${BINARY}"*.fdata > "${BOLTBIN}/${BINARY}-combined.fdata" || (echo "Could not merge fdata"; exit 1)
+    LD_PRELOAD=/usr/lib64/libjemalloc.so.2 ${BOLTPATH}/merge-fdata "${FDATA}/${BINARY}"*.fdata > "${BOLTBIN}/${BINARY}-combined.fdata" || (echo "Could not merge fdata"; exit 1)
     ## Removing not needed bloated fdata
     rm -rf "${FDATA}/${BINARY}"*.fdata
 }
 
 optimize() {
     echo "Optimizing binary with generated profile"
-    LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt "${BOLTBIN}/${BINARY}.org" \
+    LD_PRELOAD=/usr/lib64/libjemalloc.so.2 ${BOLTPATH}/llvm-bolt "${BOLTBIN}/${BINARY}.org" \
         --data "${BOLTBIN}/${BINARY}-combined.fdata" \
         -o "${BOLTBIN}/${BINARY}.bolt" \
         -reorder-blocks=ext-tsp \

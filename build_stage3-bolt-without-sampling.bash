@@ -41,10 +41,10 @@ ninja & read -rt 100 || kill $!
 
 echo "Merging generated profiles"
 cd ${TOPLEV}/stage3-without-sampling/intrumentdata || exit 1
-LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/merge-fdata ./*.fdata > combined.fdata
+LD_PRELOAD=/usr/lib64/libjemalloc.so.2 ${BOLTPATH}/merge-fdata ./*.fdata > combined.fdata
 echo "Optimizing Clang with the generated profile"
 
-LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${CPATH}/clang-18.org \
+LD_PRELOAD=/usr/lib64/libjemalloc.so.2 ${BOLTPATH}/llvm-bolt ${CPATH}/clang-18.org \
     --data combined.fdata \
     -o ${CPATH}/clang-18 \
     -reorder-blocks=ext-tsp \

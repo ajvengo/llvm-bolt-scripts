@@ -35,5 +35,6 @@ cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DCMAKE_INSTALL_PREFIX=${TOPLEV}/llvm-bolt \
     || (echo "Could not configure project!"; exit 1)
 
-echo "== Start Build"
-ninja install || (echo "Could not build project!"; exit 1)
+echo "== Start Build stage1"
+time ninja install || (echo "Could not build project!"; exit 1)
+echo "== Stop Build $(pwd)"

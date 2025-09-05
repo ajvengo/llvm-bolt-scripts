@@ -5,6 +5,8 @@ TOPLEV=~/toolchain/llvm
 # Change your compiler PATH here to compare them
 
 CPATH=${TOPLEV}/stage2-prof-use-lto/install/bin
+#CPATH=${TOPLEV}/llvm-bolt/bin
+#CPATH=/usr/bin
 
 cd ${TOPLEV} || (echo "Could not enter ${TOPLEV} directory"; exit 1)
 

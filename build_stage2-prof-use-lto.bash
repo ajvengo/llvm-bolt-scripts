@@ -42,4 +42,5 @@ cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     || (echo "Could not configure project!"; exit 1)
 
 echo "== Start Build"
-ninja install || (echo "Could not build project!"; exit 1)
+time ninja install || (echo "Could not build project!"; exit 1)
+echo "== Stop Build $(pwd)"

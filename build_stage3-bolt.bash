@@ -8,8 +8,6 @@ cd ${TOPLEV}/stage3-bolt || exit 1
 CPATH=${TOPLEV}/stage2-prof-use-lto/install/bin
 BOLTPATH=${TOPLEV}/llvm-bolt/bin
 
-
-
 echo "== Configure Build"
 echo "== Build with stage2-prof-use-tools -- $CPATH"
 
@@ -31,13 +29,13 @@ cd ${TOPLEV} || exit 1
 
 echo "Converting profile to a more aggregated form suitable to be consumed by BOLT"
 
-LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/perf2bolt ${CPATH}/clang-18 \
+LD_PRELOAD=/usr/lib64/libjemalloc.so.2 ${BOLTPATH}/perf2bolt ${CPATH}/clang-18 \
     -p ${TOPLEV}/perf.data \
     -o ${TOPLEV}/clang-18.fdata || (echo "Could not convert perf-data to bolt for clang-18"; exit 1)
 
 echo "Optimizing Clang with the generated profile"
 
-LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${CPATH}/clang-18 \
+LD_PRELOAD=/usr/lib64/libjemalloc.so.2 ${BOLTPATH}/llvm-bolt ${CPATH}/clang-18 \
     -o ${CPATH}/clang-18.bolt \
     --data ${TOPLEV}/clang-18.fdata \
     -reorder-blocks=ext-tsp \
@@ -52,7 +50,7 @@ LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${CPATH}/clang-18 \
 
 echo "Optimizing LLD with the generated profile"
 
-LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${CPATH}/lld \
+LD_PRELOAD=/usr/lib64/libjemalloc.so.2 ${BOLTPATH}/llvm-bolt ${CPATH}/lld \
     -o ${CPATH}/lld.bolt \
     --data ${TOPLEV}/clang-18.fdata \
     -reorder-blocks=ext-tsp \
