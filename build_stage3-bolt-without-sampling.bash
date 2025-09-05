@@ -1,10 +1,10 @@
 #!/bin/bash
 
 TOPLEV=~/toolchain/llvm
-cd ${TOPLEV}
+cd ${TOPLEV} || exit 1
 
 mkdir -p ${TOPLEV}/stage3-without-sampling/intrumentdata || (echo "Could not create stage3-bolt directory"; exit 1)
-cd ${TOPLEV}/stage3-without-sampling
+cd ${TOPLEV}/stage3-without-sampling || exit 1
 CPATH=${TOPLEV}/stage2-prof-use-lto/install/bin
 BOLTPATH=${TOPLEV}/llvm-bolt/bin
 
@@ -18,7 +18,7 @@ ${BOLTPATH}/llvm-bolt \
     ${CPATH}/clang-18 \
     -o ${CPATH}/clang-18.inst
 
-echo "mooving instrumented binary"
+echo "moving instrumented binary"
 mv ${CPATH}/clang-18 ${CPATH}/clang-18.org
 mv ${CPATH}/clang-18.inst ${CPATH}/clang-18
 
@@ -37,11 +37,11 @@ cmake -G Ninja ../llvm-project/llvm \
     -DCMAKE_INSTALL_PREFIX=${TOPLEV}/stage3-without-sampling/install
 
 echo "== Start Training Build"
-ninja & read -t 100 || kill $!
+ninja & read -rt 100 || kill $!
 
 echo "Merging generated profiles"
-cd ${TOPLEV}/stage3-without-sampling/intrumentdata
-LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/merge-fdata *.fdata > combined.fdata
+cd ${TOPLEV}/stage3-without-sampling/intrumentdata || exit 1
+LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/merge-fdata ./*.fdata > combined.fdata
 echo "Optimizing Clang with the generated profile"
 
 LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${CPATH}/clang-18.org \

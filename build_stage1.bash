@@ -3,7 +3,7 @@
 TOPLEV=~/toolchain/llvm
 mkdir -p ${TOPLEV}
 cd ${TOPLEV} || (echo "Could not enter ${TOPLEV} directory"; exit 1)
-git clone https://github.com/llvm/llvm-project.git
+[ -d llvm-project ] || git clone --branch=release/18.x --depth=1 https://github.com/llvm/llvm-project.git
 
 mkdir -p stage1 || (echo "Could not create stage1 directory"; exit 1)
 cd stage1 || (echo "Could not enter stage 1 directory"; exit 1)

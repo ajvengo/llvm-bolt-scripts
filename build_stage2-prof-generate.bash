@@ -1,10 +1,10 @@
 #!/bin/bash
 
 TOPLEV=~/toolchain/llvm
-cd ${TOPLEV}
+cd ${TOPLEV} || exit 1
 
 mkdir ${TOPLEV}/stage2-prof-gen || (echo "Could not create stage2-prof-generate directory"; exit 1)
-cd ${TOPLEV}/stage2-prof-gen
+cd ${TOPLEV}/stage2-prof-gen || exit 1
 CPATH=${TOPLEV}/llvm-bolt/bin
 
 echo "== Configure Build"

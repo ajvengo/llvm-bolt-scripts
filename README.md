@@ -18,7 +18,7 @@ Be sure to have jemalloc installed, as it is used to improve llvm-bolt's memory 
 
 To build the toolchain, follow these steps:
 
-Clone the repository: `git clone <https://github.com/ptr1337/llvm-bolt-scripts.git>`  
+Clone the repository: `git clone --branch=release/18.x --depth=1 <https://github.com/ptr1337/llvm-bolt-scripts.git>`  
 Navigate to the repository directory: `cd llvm-bolt-scripts`  
 Run the full workflow script: `./full_workflow.bash`  
 This process should give you a faster LLVM toolchain. You can experiment with different technologies (e.g. ThinLTO vs FullLTO) and measure the performance gains to determine if it is worth the effort.

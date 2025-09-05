@@ -1,10 +1,10 @@
 #!/bin/bash
 
 export TOPLEV=~/toolchain/llvm
-cd ${TOPLEV}
+cd ${TOPLEV} || exit 1
 
 mkdir ${TOPLEV}/stage3-bolt  || (echo "Could not create stage3-bolt directory"; exit 1)
-cd ${TOPLEV}/stage3-bolt
+cd ${TOPLEV}/stage3-bolt || exit 1
 CPATH=${TOPLEV}/stage2-prof-use-lto/install/bin
 BOLTPATH=${TOPLEV}/llvm-bolt/bin
 
@@ -27,9 +27,9 @@ cmake -G Ninja \
 echo "== Start Training Build"
 perf record -o ${TOPLEV}/perf.data --max-size=4G -F 1900 -e cycles:u -j any,u -- ninja clang || (echo "Could not build project for training!"; exit 1)
 
-cd ${TOPLEV}
+cd ${TOPLEV} || exit 1
 
-echo "Converting profile to a more aggreated form suitable to be consumed by BOLT"
+echo "Converting profile to a more aggregated form suitable to be consumed by BOLT"
 
 LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/perf2bolt ${CPATH}/clang-18 \
     -p ${TOPLEV}/perf.data \

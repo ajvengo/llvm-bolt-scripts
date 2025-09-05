@@ -1,11 +1,11 @@
 #!/bin/bash
 TOPLEV=~/toolchain/llvm
-cd ${TOPLEV}
+cd ${TOPLEV} || exit 1
 
 echo "Building Clang with PGO and LTO"
 
 mkdir ${TOPLEV}/stage2-prof-use-lto
-cd ${TOPLEV}/stage2-prof-use-lto
+cd ${TOPLEV}/stage2-prof-use-lto || exit 1
 CPATH=${TOPLEV}/llvm-bolt/bin
 
 echo "== Configure Build"

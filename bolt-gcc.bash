@@ -19,13 +19,10 @@ PERFDATA=/home/foo/perf.data
 ## Stage 2 there we use llvm-bolt top optimize the binary
 STAGE=
 
-
 mkdir -p ${DATA}/cc1
 mkdir -p ${DATA}/cc1plus
 
-
-
-if [ ${STAGE} = 1 ]; then
+if [ "${STAGE}" = 1 ]; then
     echo "Instrument clang with llvm-bolt"
 
     LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt \
@@ -41,24 +38,22 @@ if [ ${STAGE} = 1 ]; then
         --instrumentation-file=${DATA}/cc1plus/cc1plus.fdata \
         ${GCCPATH}/cc1plus \
         -o ${DATA}/cc1plus/cc1plus
-    #echo "mooving instrumented binary"
+    #echo "moving instrumented binary"
     sudo mv ${GCCPATH}/cc1 ${GCCPATH}/cc1.org
     sudo mv ${DATA}/cc1/cc1 ${GCCPATH}/cc1
-    #echo "mooving instrumented binary"
+    #echo "moving instrumented binary"
     sudo mv ${GCCPATH}/cc1plus ${GCCPATH}/cc1plus.org
     sudo mv ${DATA}/cc1plus/cc1plus ${GCCPATH}/cc1plus
 
-    echo "Now move the binarys to the gcc path"
+    echo "Now move the binaries to the gcc path"
     echo "now do some instrument compiles for example compiling a kernel or GCC"
 fi
 
-if [ ${STAGE} = 2 ]; then
+if [ "${STAGE}" = 2 ]; then
     echo "Instrument clang with llvm-bolt"
 
     ## Check if perf is available
-    perf record -e cycles:u -j any,u -- sleep 1 &>/dev/null;
-
-    if [[ $? == "0" ]]; then
+    if perf record -e cycles:u -j any,u -- sleep 1 &>/dev/null; then
         echo "BOLTING with Profile!"
 
         LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/perf2bolt ${GCCPATH}/cc1.org \
@@ -70,7 +65,7 @@ if [ ${STAGE} = 2 ]; then
             -o ${DATA}/cc1plus.fdata || (echo "Could not convert perf-data to bolt for gcc"; exit 1)
 
         echo "Optimizing cc1 with the generated profile"
-        cd ${TOPLEV}
+        cd ${TOPLEV} || exit 1
         LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${GCCPATH}/cc1.org \
             --data ${DATA}/cc1.fdata \
             -o ${TOPLEV}/cc1 \
@@ -84,7 +79,7 @@ if [ ${STAGE} = 2 ]; then
             -use-gnu-stack \
             -plt=hot || (echo "Could not optimize binary for cc1"; exit 1)
 
-        cd ${TOPLEV}
+        cd ${TOPLEV} || exit 1
         LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${GCCPATH}/cc1plus.org \
             --data ${DATA}/cc1plus.fdata \
             -o ${TOPLEV}/cc1plus \
@@ -99,13 +94,13 @@ if [ ${STAGE} = 2 ]; then
             -plt=hot || (echo "Could not optimize binary for cc1plus"; exit 1)
     else
         echo "Merging generated profiles"
-        cd ${DATA}/cc1
-        ${BOLTPATH}/merge-fdata *.fdata > cc1-combined.fdata
-        cd ${DATA}/cc1plus
-        ${BOLTPATH}/merge-fdata *.fdata > cc1plus-combined.fdata
+        cd ${DATA}/cc1 || exit 1
+        ${BOLTPATH}/merge-fdata ./*.fdata > cc1-combined.fdata
+        cd ${DATA}/cc1plus || exit 1
+        ${BOLTPATH}/merge-fdata ./*.fdata > cc1plus-combined.fdata
 
         echo "Optimizing cc1 with the generated profile"
-        cd ${TOPLEV}
+        cd ${TOPLEV} || exit 1
         LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${GCCPATH}/cc1.org \
             --data ${DATA}/cc1/cc1-combined.fdata \
             -o ${TOPLEV}/cc1 \
@@ -119,7 +114,7 @@ if [ ${STAGE} = 2 ]; then
             -use-gnu-stack \
             -plt=hot || (echo "Could not optimize binary for cc1"; exit 1)
 
-        cd ${TOPLEV}
+        cd ${TOPLEV} || exit 1
         LD_PRELOAD=/usr/lib/libjemalloc.so ${BOLTPATH}/llvm-bolt ${GCCPATH}/cc1plus.org \
             --data ${DATA}/cc1plus/cc1plus-combined.fdata \
             -o ${TOPLEV}/cc1plus \
@@ -134,10 +129,9 @@ if [ ${STAGE} = 2 ]; then
             -plt=hot || (echo "Could not optimize binary for cc1plus"; exit 1)
 
 
-        echo "mooving bolted binary"
+        echo "moving bolted binary"
         sudo mv ${TOPLEV}/cc1plus ${GCCPATH}/cc1plus
         sudo mv ${TOPLEV}/cc1 ${GCCPATH}/cc1
-        echo "Now you can move the bolted binarys to your ${GCCPATH}"
+        echo "Now you can move the bolted binaries to your ${GCCPATH}"
     fi
-
 fi

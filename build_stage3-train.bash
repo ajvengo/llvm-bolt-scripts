@@ -1,9 +1,9 @@
 #!/bin/bash
 export TOPLEV=~/toolchain/llvm
-cd ${TOPLEV}
+cd ${TOPLEV} || exit 1
 
 mkdir ${TOPLEV}/stage3-train
-cd ${TOPLEV}/stage3-train
+cd ${TOPLEV}/stage3-train || exit 1
 CPATH=${TOPLEV}/stage2-prof-gen/bin
 
 echo "Generating Profile for PGO"
@@ -32,5 +32,5 @@ ninja || (echo "Could not build project!"; exit 1)
 
 echo "Merging PGO-Profiles"
 
-cd ${TOPLEV}/stage2-prof-gen/profiles
-${TOPLEV}/llvm-bolt/bin/llvm-profdata merge -output=clang.profdata *
+cd ${TOPLEV}/stage2-prof-gen/profiles || exit 1
+${TOPLEV}/llvm-bolt/bin/llvm-profdata merge -output=clang.profdata ./*
