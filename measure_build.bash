@@ -4,30 +4,28 @@ TOPLEV=~/toolchain/llvm
 
 # Change your compiler PATH here to compare them
 
-COMPIlER_PATH=${TOPLEV}/stage2-prof-use-lto/install/bin
+CPATH=${TOPLEV}/stage2-prof-use-lto/install/bin
 
 cd ${TOPLEV} || (echo "Could not enter ${TOPLEV} directory"; exit 1)
 
-mkdir -p measure-build-time || (echo "Could not create build-directory!"; exit 1)
-cd measure-build-time
 echo "== Clean old build-artifacts"
-rm -r *
+rm -rf measure-build-time
+mkdir -p measure-build-time || (echo "Could not create build-directory!"; exit 1)
+cd measure-build-time || exit 1
 
 echo "== Configure reference Clang-build with tools from ${CPATH}"
 
-cmake 	-G Ninja \
+cmake -G Ninja ${TOPLEV}/llvm-project/llvm \
     -DCMAKE_BUILD_TYPE=Release \
-    -DCMAKE_INSTALL_PREFIX="$(pwd)/install" \
-    -DCMAKE_AR=${COMPIlER_PATH}/llvm-ar \
-    -DCMAKE_C_COMPILER=${COMPIlER_PATH}/clang \
-    -DCMAKE_CXX_COMPILER=${COMPIlER_PATH}/clang++ \
-    -DLLVM_USE_LINKER=${COMPIlER_PATH}/ld.lld \
-    -DCMAKE_RANLIB=${COMPIlER_PATH}/llvm-ranlib \
-    -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DCMAKE_C_COMPILER=${CPATH}/clang \
+    -DCMAKE_CXX_COMPILER=${CPATH}/clang++ \
     -DLLVM_ENABLE_PROJECTS="clang" \
     -DLLVM_PARALLEL_COMPILE_JOBS="$(nproc)"\
     -DLLVM_PARALLEL_LINK_JOBS="$(nproc)" \
-    ../llvm-project/llvm || (echo "Could not configure project!"; exit 1)
+    -DLLVM_TARGETS_TO_BUILD="X86" \
+    -DLLVM_USE_LINKER=lld \
+    -DCMAKE_INSTALL_PREFIX="$(pwd)/install" \
+    || (echo "Could not configure project!"; exit 1)
 
 echo
 echo "== Start Build"
